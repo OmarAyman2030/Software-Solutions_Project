@@ -1,0 +1,206 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="images/favIcon.ico.png" />
+    <title>Login</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-image: url('images/login2.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(6px);
+        }
+
+        .login-container {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 40px 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+            .login-container h2 {
+                margin-bottom: 25px;
+                color: #1e293b;
+                font-size: 26px;
+            }
+
+            .login-container input {
+                margin-left: -20px;
+                width: 100%;
+                padding: 14px;
+                margin-bottom: 15px;
+                border: 1px solid #ccc;
+                border-radius: 10px;
+                font-size: 15px;
+            }
+
+            .login-container button {
+                width: 100%;
+                padding: 14px;
+                background-color: #1e293b;
+                color: white;
+                font-weight: bold;
+                border: none;
+                border-radius: 10px;
+                cursor: pointer;
+                font-size: 16px;
+                transition: background 0.3s;
+            }
+
+                .login-container button:hover {
+                    background-color: #0f172a;
+                }
+
+        .forgot-password {
+            margin-top: 10px;
+            text-align: right;
+        }
+
+            .forgot-password a {
+                color: #1e40af;
+                text-decoration: none;
+                font-size: 14px;
+            }
+
+                .forgot-password a:hover {
+                    text-decoration: underline;
+                }
+
+        .signup-redirect {
+            margin-top: 18px;
+            font-size: 14px;
+        }
+
+            .signup-redirect a {
+                color: #1e40af;
+                font-weight: bold;
+                text-decoration: none;
+            }
+
+                .signup-redirect a:hover {
+                    text-decoration: underline;
+                }
+
+        /* Toast Notification Styles */
+        #notification {
+            display: none;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            font-size: 16px;
+            font-weight: 500;
+            z-index: 9999;
+            color: #fff;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .success {
+            background-color: #16a34a;
+        }
+
+        .error {
+            background-color: #dc2626;
+        }
+
+        .info {
+            background-color: #1e293b;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>Login</h2>
+        <form onsubmit="handleLogin(event)">
+            <input type="text" id="identifier" placeholder="Email or Phone Number" required />
+            <input type="password" id="password" placeholder="Password" required />
+            <button type="submit">Login</button>
+        </form>
+
+        <div class="forgot-password">
+            <a href="forgot-password.html">Forgot your password?</a>
+        </div>
+
+        <div class="signup-redirect">
+            <p>Don't have an account? <a href="signup.html">Sign up</a></p>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="notification"></div>
+
+    <script>
+        function showNotification(message, type = "info") {
+            const notif = document.getElementById("notification");
+            notif.textContent = message;
+            notif.className = type;
+            notif.style.display = "block";
+
+            setTimeout(() => {
+                notif.style.display = "none";
+            }, 3500);
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            const identifier = document.getElementById("identifier").value;
+            const password = document.getElementById("password").value;
+
+            if (!identifier || !password) {
+                showNotification("Please enter both your Email/PhoneNumber and password.", "error");
+                return;
+            }
+
+            try {
+                const response = await fetch("https://localhost:7087/api/AuthControlloer/login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ identifier, password })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    localStorage.setItem("token", result.token);
+                    localStorage.setItem("userInfo", JSON.stringify({ fullName: result.fullName }));
+
+                    showNotification("✅ Welcome back! Login successful.", "success");
+                    setTimeout(() => {
+                        window.location.href = "/profile.html";
+                    }, 1000);
+                }
+
+                else {
+                    const errorText = await response.text();
+                    showNotification("❌ Login failed: " + errorText, "error");
+
+                    setTimeout(() => {
+                        const goToSignup = confirm("It looks like you don’t have an account. Would you like to sign up?");
+                        if (goToSignup) {
+                            window.location.href = "/signup.html";
+                        }
+                    }, 1000);
+                }
+            } catch (err) {
+                showNotification("💥 Unexpected error: " + err.message, "error");
+            }
+        }
+    </script>
+</body>
+</html>

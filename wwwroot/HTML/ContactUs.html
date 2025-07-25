@@ -1,0 +1,149 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Contact Us</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="icon" type="image/x-icon" href="images/favIcon.ico.png">
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f8fafc;
+            margin: 0;
+        }
+
+        .contact-container {
+            max-width: 600px;
+            margin: 60px auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #0f172a;
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin: 12px 0 6px;
+            color: #1e293b;
+            font-weight: 500;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 15px;
+            box-sizing: border-box;
+        }
+
+            input[readonly] {
+                background-color: #f1f5f9;
+                cursor: not-allowed;
+            }
+
+        button {
+            background-color: #0f172a;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            margin-top: 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+            button:hover {
+                background-color: #1e293b;
+            }
+
+        .success-message {
+            color: green;
+            margin-top: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="navbar-placeholder"></div>
+
+    <div class="contact-container">
+        <h2>Register for Service</h2>
+        <form id="contactForm">
+            <label for="name">Your Name</label>
+            <input type="text" id="name" required />
+
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phone" required />
+
+            <label for="email">Email</label>
+            <input type="email" id="email" required />
+
+            <label for="serviceId">Service ID</label>
+            <input type="text" id="serviceId" readonly />
+
+            <label for="serviceTitle">Service Title</label>
+            <input type="text" id="serviceTitle" readonly />
+
+
+            <button type="submit">Submit</button>
+
+            <div class="success-message" id="successMessage" style="display: none;">
+                Your request has been submitted successfully. Our team will contact you soon.
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Load navbar
+        fetch("navbar.html")
+            .then(res => res.text())
+            .then(data => document.getElementById("navbar-placeholder").innerHTML = data);
+
+        // Get query parameters from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const serviceId = urlParams.get("serviceId");
+        const title = urlParams.get("title");
+
+        // Populate service info
+        document.getElementById("serviceId").value = serviceId || "";
+        document.getElementById("serviceTitle").value = title ? decodeURIComponent(title) : "";
+
+        // Form submit
+        document.getElementById("contactForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            // Example: Gather form data
+            const name = document.getElementById("name").value;
+            const phone = document.getElementById("phone").value;
+            const email = document.getElementById("email").value;
+
+            const data = {
+                name,
+                phone,
+                email,
+                serviceId,
+                serviceTitle: title
+            };
+
+            // TODO: Send to your API here if needed
+            console.log("Submitting data:", data);
+
+            // Success message
+            document.getElementById("successMessage").style.display = "block";
+
+            // Optional: Clear form
+            document.getElementById("contactForm").reset();
+        });
+    </script>
+
+</body>
+</html>

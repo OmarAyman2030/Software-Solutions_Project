@@ -1,0 +1,230 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Profile</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="icon" type="image/x-icon" href="images/favIcon.ico.png"/>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            background-color: #f1f5f9;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #1e293b;
+            padding: 12px 24px;
+            color: white;
+        }
+
+        .nav-left {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .user-dropdown {
+            position: relative;
+        }
+
+        .user-button {
+            background: none;
+            border: none;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: white;
+            color: #1e293b;
+            min-width: 150px;
+            box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+            border-radius: 8px;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+            .dropdown-content a {
+                color: #1e293b;
+                padding: 12px 16px;
+                text-decoration: none;
+                display: block;
+                font-size: 14px;
+            }
+
+                .dropdown-content a:hover {
+                    background-color: #f1f5f9;
+                }
+
+        .user-dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 40px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+
+            .card:hover {
+                transform: translateY(-5px);
+            }
+
+            .card img {
+                width: 100%;
+                height: 200px;
+                object-fit: cover;
+            }
+
+        .card-body {
+            padding: 16px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: #0f172a;
+        }
+
+        .card-desc {
+            font-size: 14px;
+            color: #475569;
+            margin-bottom: 10px;
+        }
+
+        .card-btn {
+            padding: 8px 12px;
+            background-color: #1e293b;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .nav-left {
+            font-size: 22px;
+            font-weight: bold;
+            color: white;
+            text-decoration: none; /* لإزالة الخط تحت النص */
+            cursor: pointer;
+        }
+
+            .nav-left:hover {
+                opacity: 0.85; /* تأثير hover بسيط */
+            }
+
+        .footer {
+            background-color: #0f172a;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="nav-left">Software Solutions</a>
+        <div class="user-dropdown">
+            <button class="user-button" id="userName">User</button>
+            <div class="dropdown-content">
+                <a href="profileData.html">My Profile Data</a>
+                <!--<a href="settings.html">Settings</a>-->
+                <a href="Login.html" onclick="logout()">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section style="padding: 20px 40px;">
+            <h2 style="color: #0f172a;">Available Services</h2>
+            <div class="service-grid" id="servicesContainer"></div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        &copy; 2025 Software Solutions. All rights reserved.
+    </footer>
+
+    <script>
+    window.addEventListener("DOMContentLoaded", () => {
+        const user = JSON.parse(localStorage.getItem("userInfo"));
+        if (user && (user.firstName || user.fullName)) {
+            let displayName = "";
+
+            //if (user.firstName) {
+            //    displayName = `${user.firstName} ${user.lastName || ""}`;
+             if (user.fullName) {
+                const names = user.fullName.split(" ");
+                displayName = `${names[0]} ${names[1] || ""}`;
+            }
+
+            document.getElementById("userName").innerHTML = `Hello Mr/Ms. ${displayName} <span style="font-size: 15px;">&#9662;</span>`;
+
+        }
+
+      loadServices();
+    });
+
+    function logout() {
+      localStorage.removeItem("token");
+      localStorage.removeItem("userInfo");
+    }
+
+    async function loadServices() {
+      try {
+        const res = await fetch("https://localhost:7087/api/ServiceCont");
+        const data = await res.json();
+
+        const container = document.getElementById("servicesContainer");
+        container.innerHTML = "";
+
+        data.forEach(service => {
+          const div = document.createElement("div");
+          div.className = "card";
+
+          div.innerHTML = `
+            <img src="${service.imageUrl}" alt="${service.title}" />
+            <div class="card-body">
+              <h3 class="card-title">${service.title}</h3>
+              <p class="card-desc">${service.description}</p>
+              <button class="card-btn" onclick="window.location.href='service-details.html?id=${service.id}'">
+                View Details
+              </button>
+            </div>
+          `;
+
+          container.appendChild(div);
+        });
+
+      } catch (error) {
+        console.error("Failed to load services:", error);
+        document.getElementById("servicesContainer").innerHTML =
+          "<p style='color:red'>Unable to load services.</p>";
+      }
+    }
+    </script>
+
+</body>
+</html>
