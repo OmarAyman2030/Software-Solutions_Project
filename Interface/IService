@@ -1,0 +1,14 @@
+using Software_Solutions.DTO;
+using Software_Solutions.Models;
+
+namespace Software_Solutions.Interface
+{
+    public interface IService
+    {
+        Task<List<Service>> GetAllServices();
+        Task<Service> GetServiceById(int id);
+        Task<Service> CreateService(ServiceDto serviceDto);
+        Task<bool> UpdateService(int id, ServiceDto dto);
+        Task<bool> DeleteService(int id);
+    }
+}
