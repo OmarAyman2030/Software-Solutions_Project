@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Software Solutions</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/x-icon" href="images/favIcon.ico.png">
+</head>
+<body>
+    <nav>
+        <div class="logo">Software Solutions</div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="OurService.html">Our Services</a></li>
+            <li><a href="ContactUs.html">Contact Us</a></li>
+            <li><a href="AboutUs.html">About Us</a></li>
+        </ul>
+        <div class="auth-buttons">
+            <a href="Login.html" class="auth-btn">Login</a>
+            <a href="signup.html" class="auth-btn">Sign Up</a>
+        </div>
+    </nav>
+
+
+
+    <header class="hero">
+        <div class="hero-content">
+            <h1>Empowering Your Business with Software Solutions</h1>
+            <p>Custom software and backend systems to elevate your company</p>
+            <a href="#services" class="btn">Explore Our Services</a>
+        </div>
+    </header>
+
+    <section id="services" style="padding: 60px 20px; background-color: #f8fafc; font-family: 'Segoe UI', sans-serif;">
+        <div style="text-align: center; margin-bottom: 40px;">
+            <h2 style="font-size: 32px; color: #0f172a; display: inline-block; border-bottom: 4px solid #00d1ff; padding-bottom: 5px; border-radius: 2px;" >
+            Our Services
+            </h2>
+            <p style="color: #475569;">Explore the solutions we provide for your business.</p>
+        </div>
+        <div id="services-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px;"></div>
+    </section>
+
+    <script>
+        async function loadServices() {
+            try {
+                const response = await fetch('https://localhost:7087/api/ServiceCont');
+                const services = await response.json();
+
+                const container = document.getElementById('services-container');
+                container.innerHTML = '';
+
+                services.forEach(service => {
+                    const card = document.createElement('div');
+                    //card.style.backgroundColor = 'rgb(20, 165, 233)';
+                    card.style.padding = '20px';
+                    card.style.borderRadius = '12px';
+                    card.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+                    card.style.transition = 'transform 0.3s ease';
+                    card.style.backgroundSize = 'cover';
+                    card.style.backgroundPosition = 'center';
+                    //card.style.color = 'white';
+                    card.onmouseover = () => card.style.transform = 'translateY(-5px)';
+                    card.onmouseout = () => card.style.transform = 'translateY(0)';
+
+                    card.innerHTML = `
+                  <img src="${service.imageUrl}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 12px 12px 0 0; margin-bottom: 15px;" />
+                  <h3 style="color: #1e293b; font-size: 20px; margin: 0 auto 15px;">${service.title}</h3>
+                  <p style="color: #1e1e2f; margin-bottom: 10px">${service.description}</p>
+                  <p style="color: #1e1e2f; margin-bottom: 6px;">
+                  <strong>Price: </strong>${service.price == 0 ? 'Contact For Quote' : service.price + '$'}
+                  </p>
+                  <p style="color: #1e1e2f; margin-bottom: 20px;"> <strong>Category: </strong>${service.category}</p>
+                   <button onclick = "handleRegister()" style="margin-top: auto; padding: 10px 16px; background-color: #1e1e2f; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                Register Now
+              </button>
+                `;
+
+                    container.appendChild(card);
+                });
+            } catch (error) {
+                console.error('Failed to fetch services:', error);
+                const container = document.getElementById('services-container');
+                container.innerHTML = '<p style="color: red;">Unable to load services. Please try again later.</p>';
+            }
+        }
+
+        // Load services when page loads
+        window.addEventListener('DOMContentLoaded', loadServices);
+    </script>
+
+
+
+    <footer class="bg-dark text-white text-center py-3">
+        <p>&copy; 2025 Software Solutions. All rights reserved.</p>
+        <p>Founder: Omar Assem</p>
+    </footer>
+
+    <script>
+        function handleRegister() {
+            const token = localStorage.getItem("userToken");
+
+            if (token) {
+                window.location.href = "/our-services.html";
+            } else {
+                alert("You must login first to register for this service.");
+                window.location.href = "Login.html";
+            }
+        }
+    </script>
+
+</body>
+</html>
