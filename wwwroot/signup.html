@@ -1,0 +1,161 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="images/favIcon.ico.png" />
+    <title>Signup - Software Solutions</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-image: url('images/login2.png');
+            background-size: cover;
+            background-position: center;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(6px);
+        }
+
+        .signup-container {
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 30px 40px;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            max-width: 400px;
+            backdrop-filter: blur(8px);
+        }
+
+            .signup-container h2 {
+                margin-bottom: 20px;
+                color: #0f172a;
+                text-align: center;
+            }
+
+            .signup-container input {
+                margin-left: -13px;
+                width: 100%;
+                padding: 12px;
+                margin-bottom: 15px;
+                border: 1px solid #ccc;
+                border-radius: 8px;
+                font-size: 14px;
+            }
+
+            .signup-container button {
+                width: 100%;
+                padding: 12px;
+                background-color: #0f172a;
+                color: white;
+                border: none;
+                border-radius: 8px;
+                font-size: 16px;
+                cursor: pointer;
+                transition: background 0.3s ease;
+            }
+
+                .signup-container button:hover {
+                    background-color: #1e293b;
+                }
+
+        .message-box {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            display: none;
+        }
+
+            .message-box.success {
+                background-color: #dcfce7;
+                color: #166534;
+            }
+
+            .message-box.error {
+                background-color: #fee2e2;
+                color: #991b1b;
+            }
+    </style>
+</head>
+<body>
+
+    <div class="signup-container">
+        <h2>Create Account</h2>
+        <form id="signupForm">
+            <input type="text" id="fullName" placeholder="Full Name" required />
+            <input type="text" id="phone" placeholder="Phone Number" required />
+            <input type="email" id="email" placeholder="Email" required />
+            <input type="password" id="password" placeholder="Password" required />
+            <input type="password" id="confirmPassword" placeholder="Confirm Password" required />
+            <button type="submit">Sign Up</button>
+        </form>
+        <div id="messageBox" class="message-box"></div>
+    </div>
+
+    <script>
+        const form = document.getElementById("signupForm");
+
+        form.addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            const fullName = document.getElementById("fullName").value.trim();
+            const phone = document.getElementById("phone").value.trim();
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value;
+            const confirmPassword = document.getElementById("confirmPassword").value;
+            const messageBox = document.getElementById("messageBox");
+
+            messageBox.style.display = "none";
+
+            if (!fullName || !phone || !email || !password || !confirmPassword) {
+                showMessage("❗ Please fill all the fields.", false);
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                showMessage("🔁 Passwords do not match.", false);
+                return;
+            }
+
+            try {
+                const response = await fetch("https://localhost:7087/api/AuthControlloer/register", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        fullName,
+                        phoneNumber: phone,
+                        email,
+                        password,
+                        confirmPassword
+                    })
+                });
+
+                const result = await response.text();
+
+                if (response.ok) {
+                    showMessage("✅ Registration successful! Please check your email to verify your account before logging in.", true);
+                    form.reset();
+                    setTimeout(() => {
+                        window.location.href = "/Login.html";
+                    }, 6000);
+                } else {
+                    showMessage("❌ Failed to register: " + result, false);
+                }
+            } catch (err) {
+                showMessage("💥 Error: " + err.message, false);
+            }
+        });
+
+        function showMessage(message, isSuccess) {
+            const box = document.getElementById("messageBox");
+            box.innerText = message;
+            box.className = "message-box " + (isSuccess ? "success" : "error");
+            box.style.display = "block";
+        }
+    </script>
+
+</body>
+</html>
